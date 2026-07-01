@@ -1,0 +1,17 @@
+# 真实配置含密钥，绝不进 Git（只提交 .example）
+configs/config.yaml
+
+# 构建产物
+bin/
+*.out
+
+# 日志
+logs/
+
+# 依赖 vendor（本项目走 go modules，不 vendor）
+vendor/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store

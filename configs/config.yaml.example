@@ -1,0 +1,29 @@
+# pickcampus-backend 配置样例
+# 复制为 config.yaml 并按实际环境填写；config.yaml 不进 Git（含密钥）
+# 任意字段均可用同名环境变量覆盖（见 env tag）
+base:
+  app:
+    service_name: pickcampus-backend
+    local_ip: 0.0.0.0
+    api_port: 8080
+    run_mode: debug          # debug / release
+    cors: "1"                # "1" 开启 CORS，其它关闭
+  mysql:
+    write_db_host: 127.0.0.1
+    write_db_port: 3306
+    write_db_user: root
+    write_db_password: password
+    write_db: pickcampus
+    table_prefix: tbl_       # 表名统一前缀
+    max_idle_conns: 10
+    max_open_conns: 100
+    conn_max_life_time: 3600 # 秒
+  redis:
+    host_and_port: 127.0.0.1:6379
+    username: ""
+    password: ""
+    db: 0
+    pool_size: 20
+custom_conf:
+  jwt_token_secret: "change-me-in-production"  # JWT 签名密钥，务必修改
+  jwt_token_expires: 86400                      # token 过期秒数（此处 24h）
