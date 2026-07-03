@@ -14,6 +14,7 @@ func RegisterRouter(g *gin.Engine) {
 	})
 
 	userHandler := NewUserHandler()
+	candidateHandler := NewCandidateHandler()
 
 	v1 := g.Group("/api/v1")
 	{
@@ -27,6 +28,13 @@ func RegisterRouter(g *gin.Engine) {
 		{
 			auth.POST("/logout", userHandler.Logout)
 			auth.GET("/user", userHandler.GetUserInfo) // 拿当前用户（me）
+
+			// 候选院校 / 候选专业
+			auth.GET("/candidates", candidateHandler.List)
+			auth.POST("/candidates", candidateHandler.AddSchool)
+			auth.DELETE("/candidates/:school_id", candidateHandler.RemoveSchool)
+			auth.POST("/candidates/:school_id/majors", candidateHandler.AddMajor)
+			auth.DELETE("/candidates/:school_id/majors", candidateHandler.RemoveMajor)
 		}
 	}
 }

@@ -16,6 +16,10 @@ const (
 	ErrCodeUserNotFound       = 1003 // 用户不存在
 	ErrCodeInvalidCredentials = 1004 // 凭证无效（邮箱或密码错误，防枚举）
 
+	// 候选段（1100-1199）
+	ErrCodeCandidateNotFound = 1101 // 候选不存在（删除/加专业时该校未在候选）
+	ErrCodeCandidateExists   = 1102 // 候选已存在（幂等场景一般不报错，预留）
+
 	// 数据库段（5000-5099）
 	ErrCodeDatabaseError = 5000
 
