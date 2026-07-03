@@ -3,14 +3,14 @@ package types
 
 // RegisterRequest 注册请求。username 可选。
 type RegisterRequest struct {
-	Email    string `json:"email" binding:"required,email,max=128"`
+	Email    string `json:"email" binding:"required,max=128"`
 	Password string `json:"password" binding:"required,min=8,max=128"`
 	Username string `json:"username" binding:"omitempty,max=64"`
 }
 
 // LoginRequest 登录请求。
 type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
+	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
