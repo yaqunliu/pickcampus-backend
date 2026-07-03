@@ -9,6 +9,9 @@ type AppConfig struct {
 	APIPort     int    `yaml:"api_port" env:"APIPort" env-default:"8080"`
 	RunMode     string `yaml:"run_mode" env:"RunMode" env-default:"debug"`
 	Cors        string `yaml:"cors" env:"Cors" env-default:"1"`
+	// CorsAllowOrigins 允许的跨域来源(逗号分隔)。空=回显任意 Origin(本地开发);
+	// 非空=仅放行清单内来源(生产收敛到前端域名)。
+	CorsAllowOrigins string `yaml:"cors_allow_origins" env:"CORS_ALLOW_ORIGINS"`
 }
 
 // MySQLConfig MySQL 连接配置。
@@ -22,6 +25,9 @@ type MySQLConfig struct {
 	MaxIdleConns    int    `yaml:"max_idle_conns" env:"MaxIdleConns" env-default:"10"`
 	MaxOpenConns    int    `yaml:"max_open_conns" env:"MaxOpenConns" env-default:"100"`
 	ConnMaxLifeTime int64  `yaml:"conn_max_life_time" env:"ConnMaxLifeTime" env-default:"3600"`
+	// SkipEnsureDB 为 true 时跳过启动时的 CREATE DATABASE IF NOT EXISTS,
+	// 仅连接已存在的库(生产用,应用账号只需库级权限)。
+	SkipEnsureDB bool `yaml:"skip_ensure_db" env:"SkipEnsureDB" env-default:"false"`
 }
 
 // RedisConfig Redis 连接配置。

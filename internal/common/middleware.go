@@ -92,12 +92,24 @@ func GetEmail(c *gin.Context) (string, bool) {
 }
 
 // Cors 跨域中间件（前后端分离，允许携带凭证）。
-func Cors() gin.HandlerFunc {
+// allowOriginsCSV 为逗号分隔的允许来源清单：
+//   - 空:回显任意 Origin（本地开发,localhost 任意端口可连）
+//   - 非空:仅回显命中清单的 Origin（生产收敛到前端域名,未命中则不发 Allow-Origin,浏览器拦截）
+func Cors(allowOriginsCSV string) gin.HandlerFunc {
+	allowed := make(map[string]struct{})
+	for o := range strings.SplitSeq(allowOriginsCSV, ",") {
+		if o = strings.TrimSpace(o); o != "" {
+			allowed[o] = struct{}{}
+		}
+	}
 	return func(c *gin.Context) {
 		origin := c.GetHeader("Origin")
 		if origin != "" {
-			c.Header("Access-Control-Allow-Origin", origin)
-			c.Header("Access-Control-Allow-Credentials", "true")
+			_, hit := allowed[origin]
+			if len(allowed) == 0 || hit {
+				c.Header("Access-Control-Allow-Origin", origin)
+				c.Header("Access-Control-Allow-Credentials", "true")
+			}
 		}
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization")

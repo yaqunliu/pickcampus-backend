@@ -18,10 +18,13 @@ import (
 var _db *gorm.DB
 
 // InitDB 建立 MySQL 连接：先自动建库（IF NOT EXISTS），再连库并配置连接池与命名策略。
+// SkipEnsureDB=true 时跳过建库，只连已存在的库（生产：库预建、账号仅库级权限）。
 func InitDB(cfg config.MySQLConfig) error {
-	// ① 用无库名 DSN 建库（utf8mb4）
-	if err := ensureDatabase(cfg); err != nil {
-		return fmt.Errorf("建库失败: %w", err)
+	// ① 用无库名 DSN 建库（utf8mb4）；显式跳过时直接连库
+	if !cfg.SkipEnsureDB {
+		if err := ensureDatabase(cfg); err != nil {
+			return fmt.Errorf("建库失败: %w", err)
+		}
 	}
 
 	// ② 连接目标库

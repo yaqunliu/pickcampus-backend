@@ -1,0 +1,14 @@
+.git
+.gitignore
+bin/
+*.out
+logs/
+doc/
+*.md
+.idea/
+.vscode/
+.DS_Store
+configs/config.yaml
+.env
+Dockerfile
+docker-compose.yml

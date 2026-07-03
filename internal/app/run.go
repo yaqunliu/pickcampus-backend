@@ -71,7 +71,7 @@ func run() error {
 	g := gin.New()
 	g.Use(gin.Recovery())
 	if config.G.Base.App.Cors == "1" {
-		g.Use(common.Cors())
+		g.Use(common.Cors(config.G.Base.App.CorsAllowOrigins))
 	}
 
 	// ⑤ 注册路由

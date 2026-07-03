@@ -1,0 +1,68 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pickcampus-backend:latest
+    container_name: pickcampus-backend
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    # 刻意不映射宿主端口:仅 compose 内网可达,对外一律经 cloudflared 隧道。
+    # 如需在宿主本地 curl 冒烟,临时打开下一行(只绑回环):
+    # ports: ["127.0.0.1:8080:8080"]
+    expose:
+      - "8080"
+    environment:
+      RunMode: release
+      # —— 云数据库(外部,走内网地址)——
+      WriteDBHost: ${DB_HOST}
+      WriteDBPort: ${DB_PORT:-3306}
+      WriteDBUser: ${DB_USER}
+      WriteDBPassword: ${DB_PASSWORD}
+      WriteDB: ${DB_NAME:-pickcampus}
+      SkipEnsureDB: "1"                 # 方案 B:生产跳过自动建库,只连已存在的库
+      # —— 本机 Redis(compose 内网,服务名寻址)——
+      RedisHostAndPort: redis:6379
+      RedisPassword: ${REDIS_PASSWORD:-}
+      # —— CORS:空=回显任意 Origin(本地开发);生产填前端域名收敛 ——
+      CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS:-}
+      # —— 业务 ——
+      JWTTokenSecret: ${JWT_SECRET}
+      JWTTokenExpires: "86400"
+      TZ: Asia/Shanghai
+    networks: [pickcampus]
+
+  redis:
+    image: redis:7-alpine
+    container_name: pickcampus-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks: [pickcampus]
+    # 不映射端口到宿主:仅 compose 内网可达
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: pickcampus-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN}   # 在 CF Zero Trust 建隧道后拿到的 token
+    depends_on: [app]
+    networks: [pickcampus]
+    # 无需映射端口:出站连 Cloudflare,反向把 api.你的域名 路由到 app:8080
+
+volumes:
+  redis-data:
+
+networks:
+  pickcampus:
+    driver: bridge

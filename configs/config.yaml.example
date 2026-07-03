@@ -8,6 +8,7 @@ base:
     api_port: 8080
     run_mode: debug          # debug / release
     cors: "1"                # "1" 开启 CORS，其它关闭
+    cors_allow_origins: ""   # 空=回显任意 Origin(本地开发)；生产填前端域名(逗号分隔)收敛
   mysql:
     write_db_host: 127.0.0.1
     write_db_port: 3306
@@ -18,6 +19,7 @@ base:
     max_idle_conns: 10
     max_open_conns: 100
     conn_max_life_time: 3600 # 秒
+    skip_ensure_db: false    # true=跳过启动自动建库,只连已存在的库(生产)
   redis:
     host_and_port: 127.0.0.1:6379
     username: ""
