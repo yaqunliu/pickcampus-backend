@@ -31,6 +31,7 @@ services:
       # —— 业务 ——
       JWTTokenSecret: ${JWT_SECRET}
       JWTTokenExpires: "86400"
+      AmapKey: ${AMAP_KEY}              # 高德 Web 服务 key(离家路程查询),在 .env 里填 AMAP_KEY
       TZ: Asia/Shanghai
     networks: [pickcampus]
 
