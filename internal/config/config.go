@@ -50,6 +50,8 @@ type BaseConfig struct {
 type CustomConf struct {
 	JWTTokenSecret  string `yaml:"jwt_token_secret" env:"JWTTokenSecret"`
 	JWTTokenExpires int64  `yaml:"jwt_token_expires" env:"JWTTokenExpires" env-default:"86400"`
+	// AmapKey 高德 Web 服务 key（路程查询用，藏后端，不进前端/Git）。空则 /api/route 不可用。
+	AmapKey string `yaml:"amap_key" env:"AmapKey"`
 }
 
 // Config 顶层配置。

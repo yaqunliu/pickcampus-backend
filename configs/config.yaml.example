@@ -29,3 +29,4 @@ base:
 custom_conf:
   jwt_token_secret: "change-me-in-production"  # JWT 签名密钥，务必修改
   jwt_token_expires: 86400                      # token 过期秒数（此处 24h）
+  amap_key: ""                                  # 高德 Web 服务 key(路程查询)。留空则 /api/route 报未配置;填入即启用

@@ -20,6 +20,10 @@ const (
 	ErrCodeCandidateNotFound = 1101 // 候选不存在（删除/加专业时该校未在候选）
 	ErrCodeCandidateExists   = 1102 // 候选已存在（幂等场景一般不报错，预留）
 
+	// 路程/外部服务段（1200-1299）
+	ErrCodeRouteNotConfigured = 1201 // 高德 key 未配置，路程服务不可用
+	ErrCodeRouteUpstream      = 1202 // 高德上游调用失败
+
 	// 数据库段（5000-5099）
 	ErrCodeDatabaseError = 5000
 
