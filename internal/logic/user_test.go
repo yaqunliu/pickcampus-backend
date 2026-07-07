@@ -102,7 +102,7 @@ func TestRegisterRequestValidation(t *testing.T) {
 	}{
 		{"合法请求", types.RegisterRequest{Email: "u@example.com", Password: "12345678", Username: "u"}, false},
 		{"username 可选为空", types.RegisterRequest{Email: "u@example.com", Password: "12345678"}, false},
-		{"邮箱格式非法", types.RegisterRequest{Email: "not-an-email", Password: "12345678"}, true},
+		{"邮箱格式不校验（可随便填）", types.RegisterRequest{Email: "not-an-email", Password: "12345678"}, false},
 		{"邮箱缺失", types.RegisterRequest{Password: "12345678"}, true},
 		{"密码过短", types.RegisterRequest{Email: "u@example.com", Password: "123"}, true},
 		{"密码缺失", types.RegisterRequest{Email: "u@example.com"}, true},

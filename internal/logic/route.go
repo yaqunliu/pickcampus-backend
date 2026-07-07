@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	"pickcampus-backend/internal/bootstrap"
 	"pickcampus-backend/internal/common"
 	"pickcampus-backend/internal/config"
 	"pickcampus-backend/internal/types"
@@ -32,11 +33,17 @@ func NewRouteLogic(ctx context.Context) *RouteLogic {
 }
 
 // Query 查询家乡→院校路程：驾车 + 跨城公交（含高铁）。
+// 先查 Redis 缓存（TTL 30 天）命中即返回；未命中再调高德，成功后回写缓存。
 // 两项各自独立，任一成功即返回；均失败才报上游错误（前端据此降级到直线估算）。
 func (l *RouteLogic) Query(q types.RouteQuery) (*types.RouteData, error) {
 	key := config.G.Conf.AmapKey
 	if key == "" {
 		return nil, NewBizError(common.ErrCodeRouteNotConfigured, "路程服务未配置")
+	}
+
+	cacheKey := common.GetRouteCacheRedisKey(q.OLng, q.OLat, q.DLng, q.DLat, q.OCity, q.DCity)
+	if cached := l.readCache(cacheKey); cached != nil {
+		return cached, nil
 	}
 
 	client := &http.Client{Timeout: 6 * time.Second}
@@ -56,7 +63,39 @@ func (l *RouteLogic) Query(q types.RouteQuery) (*types.RouteData, error) {
 	if !okAny {
 		return nil, NewBizError(common.ErrCodeRouteUpstream, "路程查询失败")
 	}
+
+	l.writeCache(cacheKey, data)
 	return data, nil
+}
+
+// readCache 读路程缓存；未命中/反序列化失败/Redis 未初始化均返回 nil（视为未命中，走高德）。
+func (l *RouteLogic) readCache(cacheKey string) *types.RouteData {
+	cli := bootstrap.GetCli()
+	if cli == nil {
+		return nil
+	}
+	raw, err := bootstrap.NewCRUD(l.Ctx, cli).Get(cacheKey)
+	if err != nil {
+		return nil // redis.Nil（未命中）或其它错误，均降级到实时查询
+	}
+	var data types.RouteData
+	if json.Unmarshal([]byte(raw), &data) != nil {
+		return nil
+	}
+	return &data
+}
+
+// writeCache 回写路程缓存，TTL 30 天。失败仅忽略（不影响本次返回）。
+func (l *RouteLogic) writeCache(cacheKey string, data *types.RouteData) {
+	cli := bootstrap.GetCli()
+	if cli == nil {
+		return
+	}
+	raw, err := json.Marshal(data)
+	if err != nil {
+		return
+	}
+	_ = bootstrap.NewCRUD(l.Ctx, cli).Set(cacheKey, raw, common.RouteCacheTTL)
 }
 
 // fetchDriving 高德驾车路径规划：取首条方案的里程/时长。
