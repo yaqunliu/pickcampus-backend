@@ -4,4 +4,5 @@ package models
 var AllTables = []interface{}{
 	&User{},
 	&Candidate{},
+	&ExamProfile{},
 }

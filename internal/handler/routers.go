@@ -16,6 +16,7 @@ func RegisterRouter(g *gin.Engine) {
 	userHandler := NewUserHandler()
 	candidateHandler := NewCandidateHandler()
 	routeHandler := NewRouteHandler()
+	examHandler := NewExamHandler()
 
 	v1 := g.Group("/api/v1")
 	{
@@ -37,6 +38,10 @@ func RegisterRouter(g *gin.Engine) {
 			auth.DELETE("/candidates/:school_id", candidateHandler.RemoveSchool)
 			auth.POST("/candidates/:school_id/majors", candidateHandler.AddMajor)
 			auth.DELETE("/candidates/:school_id/majors", candidateHandler.RemoveMajor)
+
+			// 测档档案(一用户一行,整体读/存)
+			auth.GET("/exam", examHandler.Get)
+			auth.PUT("/exam", examHandler.Save)
 		}
 	}
 }
