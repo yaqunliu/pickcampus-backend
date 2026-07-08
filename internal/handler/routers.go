@@ -17,6 +17,7 @@ func RegisterRouter(g *gin.Engine) {
 	candidateHandler := NewCandidateHandler()
 	routeHandler := NewRouteHandler()
 	examHandler := NewExamHandler()
+	admissionHandler := NewAdmissionHandler()
 
 	v1 := g.Group("/api/v1")
 	{
@@ -24,6 +25,10 @@ func RegisterRouter(g *gin.Engine) {
 		v1.POST("/register", userHandler.Register)
 		v1.POST("/login", userHandler.Login)
 		v1.GET("/route", routeHandler.Query) // 离家路程查询(高德代理),无需登录
+		// 录取/专业数据(公开只读,读穿透 Redis + Cache-Control)
+		v1.GET("/admission", admissionHandler.College)
+		v1.GET("/admission-major", admissionHandler.Major)
+		v1.GET("/university-majors", admissionHandler.UniversityMajors)
 
 		// 受保护接口（JWT + Redis 会话校验）
 		auth := v1.Group("")

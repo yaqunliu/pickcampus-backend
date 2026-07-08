@@ -5,4 +5,5 @@ var AllTables = []interface{}{
 	&User{},
 	&Candidate{},
 	&ExamProfile{},
+	&Admission{},
 }
